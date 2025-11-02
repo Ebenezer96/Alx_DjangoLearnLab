@@ -1,5 +1,13 @@
-# Django Project and App Creation Commands
+# Create Operation
 
-## 1. Create the Django project
-```bash
-django-admin startproject LibraryProject
+### Command:
+```python
+from bookshelf.models import Book
+
+book = Book.objects.create(
+    title="1984",
+    author="George Orwell",
+    publication_year=1949
+)
+
+book
