@@ -40,7 +40,16 @@ INSTALLED_APPS = [
     'bookstore',
     'bookshelf',
     'relationship_app',
+
 ]
+
+# Redirect unauthorized users to this page
+LOGIN_URL = '/login/'
+
+# Optional but recommended
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
