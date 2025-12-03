@@ -6,7 +6,7 @@ urlpatterns = [
     path('books/', views.list_books, name='list_books'),
     path('libraries/<int:pk>/', views.LibraryDetailView.as_view(), name='library_detail'),
 
-    # Authentication URLs
+    # Authentication
     path(
         'login/',
         LoginView.as_view(template_name="relationship_app/login.html"),
@@ -18,13 +18,14 @@ urlpatterns = [
         name='logout'
     ),
     path('register/', views.register, name='register'),
-    
-    # Role-based access URLs
-    
+
+    # Role-based views
     path('admin-area/', views.admin_view, name='admin_view'),
     path('librarian-area/', views.librarian_view, name='librarian_view'),
     path('member-area/', views.member_view, name='member_view'),
-     path("books/add/", views.add_book, name="add_book"),
-    path("books/<int:book_id>/edit/", views.edit_book, name="edit_book"),
-    path("books/<int:book_id>/delete/", views.delete_book, name="delete_book"),
+
+    # Required by ALX checker
+    path("add_book/", views.add_book, name="add_book"),
+    path("edit_book/<int:pk>/", views.edit_book, name="edit_book"),
+    path("delete_book/<int:pk>/", views.delete_book, name="delete_book"),
 ]
