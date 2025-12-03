@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic.detail import DetailView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.forms import UserCreationForm
@@ -8,6 +8,7 @@ from .models import Book
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render
 from .models import UserProfile
+from django.contrib.auth.decorators import permission_required
 
 
 
@@ -64,3 +65,21 @@ def librarian_view(request):
 @user_passes_test(is_member)
 def member_view(request):
     return render(request, "relationship_app/member_view.html")
+
+
+@permission_required("relationship_app.can_add_book")
+def add_book(request):
+    # your existing add-book logic here
+    ...
+
+
+@permission_required("relationship_app.can_change_book")
+def edit_book(request, book_id):
+    # your existing edit-book logic here
+    ...
+
+
+@permission_required("relationship_app.can_delete_book")
+def delete_book(request, book_id):
+    # your existing delete-book logic here
+    ...
