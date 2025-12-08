@@ -230,3 +230,7 @@ class BookAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         years = [b["publication_year"] for b in response.data]
         self.assertEqual(years, sorted(years, reverse=True))
+        
+        def test_login_for_test_environment(self):
+            login_success = self.client.login(username="testuser", password="testpassword123")
+            self.assertTrue(login_success)
