@@ -8,21 +8,17 @@
 </head>
 <body>
 
-<nav>
-    <a href="/">Home</a>
-
-  <nav>
+<nav class="navbar">
     <a href="{% url 'home' %}">Home</a>
 
     {% if user.is_authenticated %}
+        <a href="{% url 'blog:post-create' %}">New Post</a>
         <a href="{% url 'profile' %}">Profile</a>
         <a href="{% url 'logout' %}">Logout</a>
     {% else %}
         <a href="{% url 'login' %}">Login</a>
         <a href="{% url 'register' %}">Register</a>
     {% endif %}
-</nav>
-
 </nav>
 
 <main class="container">
