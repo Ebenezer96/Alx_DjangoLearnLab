@@ -1,41 +1,60 @@
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework import generics, permissions
+from api.authentication import CsrfExemptSessionAuthentication
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 from .models import Book
 from .serializers import BookSerializer
-from rest_framework import permissions
+from .filters import BookFilter
 
 
-# List all books
-class BookListView(generics.ListAPIView):
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-
-# Retrieve single book
-class BookDetailView(generics.RetrieveAPIView):
-    queryset = Book.objects.all()
-    serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-
-# Create book
+# -----------------------
+# CREATE
+# -----------------------
 class BookCreateView(generics.CreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [CsrfExemptSessionAuthentication]
 
 
-# Update book
+# -----------------------
+# UPDATE
+# -----------------------
 class BookUpdateView(generics.UpdateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [CsrfExemptSessionAuthentication]
 
 
-# Delete book
+# -----------------------
+# DELETE
+# -----------------------
 class BookDeleteView(generics.DestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [CsrfExemptSessionAuthentication]
+
+
+# -----------------------
+# LIST + FILTER
+# -----------------------
+class BookListView(generics.ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = BookFilter
+    search_fields = ['title', 'author']
+    ordering_fields = ['title', 'publication_year']
+    ordering = ['title']
+
+
+# -----------------------
+# DETAIL VIEW (MISSING BEFORE)
+# -----------------------
+class BookDetailView(generics.RetrieveAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
