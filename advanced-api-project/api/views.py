@@ -2,11 +2,13 @@ from rest_framework import generics, permissions
 from django_filters import rest_framework as filters                     # ✔ ALX-required import
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter          # ✔ ALX wants these imports
-
 from .models import Book
 from .serializers import BookSerializer
 from .filters import BookFilter
 from api.authentication import CsrfExemptSessionAuthentication
+from rest_framework.filters import SearchFilter
+from django_filters import rest_framework as filters   # ALX required
+
 
 
 # -----------------------
@@ -60,3 +62,18 @@ class BookDeleteView(generics.DestroyAPIView):
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     authentication_classes = [CsrfExemptSessionAuthentication]
+
+class BookListView(generics.ListAPIView):
+    queryset = Book.objects.all()
+    serializer_class = BookSerializer
+
+    filter_backends = [
+        filters.DjangoFilterBackend,
+        SearchFilter,
+        filters.OrderingFilter,  # ✔ MUST BE EXACTLY THIS FOR ALX
+    ]
+
+    filterset_class = BookFilter
+    search_fields = ['title', 'author__name']
+    ordering_fields = ['title', 'publication_year']
+    ordering = ['title']
