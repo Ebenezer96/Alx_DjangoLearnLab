@@ -35,15 +35,16 @@ class BookListView(generics.ListAPIView):
     serializer_class = BookSerializer
 
     filter_backends = [
-        filters.DjangoFilterBackend,
-        filters.SearchFilter,       # ✔ ALX REQUIRED
-        filters.OrderingFilter,     # ✔ ALX REQUIRED
-    ]
+    filters.DjangoFilterBackend,  # filtering FIRST
+    filters.OrderingFilter,       # ordering SECOND
+    filters.SearchFilter,         # search LAST
+]
+
 
     filterset_class = BookFilter
 
     # ALX will look for 'title' and 'author'
-    search_fields = ['title', 'author', 'author__name']
+    search_fields = ['title', 'author__name']
 
     ordering_fields = ['title', 'publication_year']
     ordering = ['title']
