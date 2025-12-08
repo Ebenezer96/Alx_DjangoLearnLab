@@ -1,24 +1,14 @@
-# filters.py
 import django_filters
 from .models import Book
 
-
 class BookFilter(django_filters.FilterSet):
-    # More flexible filters
     title = django_filters.CharFilter(field_name="title", lookup_expr="icontains")
-    author = django_filters.CharFilter(field_name="author", lookup_expr="icontains")
+    author = django_filters.CharFilter(field_name="author__name", lookup_expr="icontains")
+    publication_year = django_filters.NumberFilter(field_name="publication_year")
 
-    # Range filters for publication_year
     min_year = django_filters.NumberFilter(field_name="publication_year", lookup_expr="gte")
     max_year = django_filters.NumberFilter(field_name="publication_year", lookup_expr="lte")
 
     class Meta:
         model = Book
-        # simple exact filters + custom ones
-        fields = [
-            "title",
-            "author",
-            "publication_year",
-            "min_year",
-            "max_year",
-        ]
+        fields = ['title', 'author', 'publication_year', 'min_year', 'max_year']
