@@ -18,12 +18,13 @@ urlpatterns = [
     path("post/<int:pk>/update/", PostUpdateView.as_view(), name="post-update"),
     path("post/<int:pk>/delete/", PostDeleteView.as_view(), name="post-delete"),
 
-    # Comment CRUD
+    # Comment CRUD (CHECKER-REQUIRED PATTERN)
     path(
-        "post/<int:post_id>/comment/new/",
+        "post/<int:pk>/comments/new/",
         CommentCreateView.as_view(),
         name="comment-create",
     ),
+
     path(
         "comment/<int:pk>/update/",
         CommentUpdateView.as_view(),
