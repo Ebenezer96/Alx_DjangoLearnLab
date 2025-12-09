@@ -4,7 +4,7 @@
 <h2>Latest Posts</h2>
 
 {% if user.is_authenticated %}
-    <p><a href="{% url 'blog:post-create' %}">Create New Post</a></p>
+    <p><a href="{% url 'blog:post-new' %}">Create New Post</a></p>
 {% endif %}
 
 {% for post in posts %}
