@@ -91,10 +91,7 @@ class LikePostView(APIView):
     def post(self, request, pk):
         post = get_object_or_404(Post, pk=pk)
 
-        like, created = Like.objects.get_or_create(
-            user=request.user,
-            post=post,
-        )
+        like, created = Like.objects.get_or_create(user =request.user, post=post)
 
         if not created:
             return Response(
