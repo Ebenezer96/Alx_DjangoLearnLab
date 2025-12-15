@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import CustomUser
 from .models import User
 from .serializers import (
     RegisterSerializer,
@@ -44,7 +43,7 @@ class ProfileView(RetrieveUpdateAPIView):
         return self.request.user
 
 class FollowUserView(generics.GenericAPIView):
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     lookup_url_kwarg = "user_id"   # ✅ REQUIRED
 
@@ -65,7 +64,7 @@ class FollowUserView(generics.GenericAPIView):
 
 
 class UnfollowUserView(generics.GenericAPIView):
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     lookup_url_kwarg = "user_id"   # ✅ REQUIRED
 
