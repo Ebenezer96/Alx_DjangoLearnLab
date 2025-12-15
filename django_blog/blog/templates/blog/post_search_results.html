@@ -1,0 +1,35 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+<h1>Search Results</h1>
+
+{% if query %}
+    <p>Results for: <strong>{{ query }}</strong></p>
+{% else %}
+    <p>No search term provided. Showing all posts.</p>
+{% endif %}
+
+{% if posts %}
+    <ul>
+        {% for post in posts %}
+            <li>
+                <a href="{% url 'blog:post-detail' post.pk %}">{{ post.title }}</a>
+                <small>• {{ post.created_at|date:"M d, Y H:i" }}</small>
+                {% if post.tags.all %}
+                    <br>
+                    <small>
+                        Tags:
+                        {% for tag in post.tags.all %}
+                            <a href="{% url 'blog:posts-by-tag' tag.name %}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </small>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No posts matched your search.</p>
+{% endif %}
+
+<a href="{% url 'blog:post-list' %}">Back to all posts</a>
+{% endblock %}

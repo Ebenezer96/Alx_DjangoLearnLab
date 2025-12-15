@@ -1,45 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Django Blog</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
-</head>
-<body>
-
 <nav class="navbar">
     <a href="{% url 'home' %}">Home</a>
 
     {% if user.is_authenticated %}
         <a href="{% url 'blog:post-new' %}">New Post</a>
         <a href="{% url 'profile' %}">Profile</a>
-
-        <!-- FIXED LOGOUT BUTTON -->
         <form action="{% url 'logout' %}" method="POST" style="display:inline;">
             {% csrf_token %}
-            <button type="submit" style="
-                background:none;
-                border:none;
-                color:inherit;
-                cursor:pointer;
-                padding:0;
-                font:inherit;
-            ">
+            <button type="submit" style="background:none;border:none;color:inherit;cursor:pointer;padding:0;font:inherit;">
                 Logout
             </button>
         </form>
-
     {% else %}
         <a href="{% url 'login' %}">Login</a>
         <a href="{% url 'register' %}">Register</a>
     {% endif %}
+
+    <!-- Search bar -->
+    <form method="get" action="{% url 'blog:post-search' %}" style="display:inline;margin-left:20px;">
+        <input
+            type="text"
+            name="q"
+            placeholder="Search posts..."
+            value="{{ request.GET.q|default:'' }}"
+        >
+        <button type="submit">Search</button>
+    </form>
 </nav>
-
-<main class="container">
-    {% block content %}
-    {% endblock %}
-</main>
-
-</body>
-</html>

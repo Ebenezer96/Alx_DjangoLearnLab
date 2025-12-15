@@ -1,30 +1,78 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Post
+from django.db.models import Q
+
+from .models import Post, Comment, Tag
 from .forms import PostForm, CustomUserCreationForm, ProfileForm, CommentForm
-from .models import Post, Comment
 
 
-
-# ============================
-#          HOME VIEW
-# ============================
-
+# ------------------------------
+# HOME VIEW
+# ------------------------------
 def home(request):
     posts = Post.objects.all().order_by("-created_at")
     return render(request, "blog/home.html", {"posts": posts})
 
 
-# ============================
-#     CLASS-BASED CRUD VIEWS
-# ============================
+# ------------------------------
+# USER SIGNUP
+# ------------------------------
+def signup(request):
+    if request.method == "POST":
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("home")
+    else:
+        form = UserCreationForm()
 
+    return render(request, "blog/register.html", {"form": form})
+
+
+# ------------------------------
+# USER REGISTER (Custom)
+# ------------------------------
+def register(request):
+    if request.method == "POST":
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Registration successful.")
+            return redirect("profile")
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, "blog/register.html", {"form": form})
+
+
+# ------------------------------
+# PROFILE
+# ------------------------------
+@login_required
+def profile(request):
+    if request.method == "POST":
+        form = ProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully.")
+            return redirect("profile")
+    else:
+        form = ProfileForm(instance=request.user)
+
+    return render(request, "blog/profile.html", {"form": form})
+
+
+# ------------------------------
+# POST CRUD
+# ------------------------------
 class PostListView(ListView):
     model = Post
     template_name = "blog/post_list.html"
@@ -39,7 +87,7 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["form"] = CommentForm()  # form used for adding comments
+        context["form"] = CommentForm()
         return context
 
 
@@ -73,59 +121,9 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return self.request.user == post.author
 
 
-
-# ============================
-#          USER SIGNUP
-# ============================
-
-def signup(request):
-    if request.method == "POST":
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect("home")
-    else:
-        form = UserCreationForm()
-
-    return render(request, "registration/signup.html", {"form": form})
-
-
-def register(request):
-    if request.method == "POST":
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            messages.success(request, "Registration successful.")
-            return redirect("profile")
-    else:
-        form = CustomUserCreationForm()
-
-    return render(request, "blog/register.html", {"form": form})
-
-
-# ============================
-#         USER PROFILE
-# ============================
-
-@login_required
-def profile(request):
-    if request.method == "POST":
-        form = ProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Profile updated successfully.")
-            return redirect("profile")
-    else:
-        form = ProfileForm(instance=request.user)
-
-    return render(request, "blog/profile.html", {"form": form})
-
-# ============================
-#         COMMENT CREATE
-# ============================
-
+# ------------------------------
+# COMMENT CRUD
+# ------------------------------
 class CommentCreateView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
@@ -139,9 +137,6 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     def get_success_url(self):
         return self.object.post.get_absolute_url()
 
-# ============================
-#         COMMENT UPDATE
-# ============================
 
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
@@ -151,9 +146,10 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
-# ============================
-#         COMMENT DELETE
-# ============================
+
+    def get_success_url(self):
+        return self.object.post.get_absolute_url()
+
 
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
@@ -165,3 +161,46 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_success_url(self):
         return self.object.post.get_absolute_url()
+
+
+# ------------------------------
+# TAG VIEW
+# ------------------------------
+class TagPostListView(ListView):
+    model = Post
+    template_name = "blog/post_list_by_tag.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag, name=self.kwargs["tag_name"])
+        return self.tag.posts.all().order_by("-created_at")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["tag"] = self.tag
+        return context
+
+
+# ------------------------------
+# SEARCH VIEW
+# ------------------------------
+class PostSearchView(ListView):
+    model = Post
+    template_name = "blog/post_search_results.html"
+    context_object_name = "posts"
+
+    def get_queryset(self):
+        query = self.request.GET.get("q", "").strip()
+        qs = Post.objects.all()
+        if query:
+            qs = qs.filter(
+                Q(title__icontains=query)
+                | Q(content__icontains=query)
+                | Q(tags__name__icontains=query)
+            ).distinct()
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["query"] = self.request.GET.get("q", "").strip()
+        return context
