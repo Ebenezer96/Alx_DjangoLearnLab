@@ -62,6 +62,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "csp.middleware.CSPMiddleware",
+    "bookshelf.middleware.ContentSecurityPolicyMiddleware",
+
 ]
 
 ROOT_URLCONF = 'LibraryProject.urls'
@@ -135,3 +139,17 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# SECURITY: Do not run with debug turned on in production
+DEBUG = False  # Set True only for local development
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
+
+# SECURITY: Browser-side protections
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+
+# SECURITY: Cookies over HTTPS only (requires HTTPS in production)
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
