@@ -155,6 +155,9 @@ if ENVIRONMENT == "production":
     SECURE_HSTS_PRELOAD = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    
 else:
     # Development defaults
     SECURE_SSL_REDIRECT = False
