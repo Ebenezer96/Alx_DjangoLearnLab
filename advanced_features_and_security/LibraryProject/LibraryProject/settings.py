@@ -144,6 +144,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DEBUG = False  # Set True only for local development
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
+import os
+
+ENVIRONMENT = os.getenv("DJANGO_ENV", "development")
+
+if ENVIRONMENT == "production":
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+else:
+    # Development defaults
+    SECURE_SSL_REDIRECT = False
+    SECURE_HSTS_SECONDS = 0
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
 
 # SECURITY: Browser-side protections
 SECURE_BROWSER_XSS_FILTER = True
@@ -153,3 +171,36 @@ X_FRAME_OPTIONS = "DENY"
 # SECURITY: Cookies over HTTPS only (requires HTTPS in production)
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+
+# =========================
+# HTTPS / TLS ENFORCEMENT
+# =========================
+
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True
+
+# HTTP Strict Transport Security (HSTS)
+# 31536000 seconds = 1 year
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# =========================
+# SECURE COOKIES (HTTPS ONLY)
+# =========================
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# =========================
+# SECURE HEADERS
+# =========================
+
+# Clickjacking protection
+X_FRAME_OPTIONS = "DENY"
+
+# Prevent MIME type sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Enable browser XSS filter (legacy browsers)
+SECURE_BROWSER_XSS_FILTER = True
